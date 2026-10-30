@@ -30,7 +30,12 @@ export function sessionMiddleware(req, res, next) {
     id = randomUUID();
     const value = `${id}.${sign(id)}`;
     const secure = env.NODE_ENV === 'production' ? '; Secure' : '';
-    res.append('Set-Cookie', `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${MAX_AGE_SECONDS}${secure}`);
+   const sameSite = env.NODE_ENV === 'production' ? 'None' : 'Lax';
+
+    res.append(
+          'Set-Cookie',
+          `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${MAX_AGE_SECONDS}${secure}`
+    );
   }
   req.investigationSessionId = id;
   next();
