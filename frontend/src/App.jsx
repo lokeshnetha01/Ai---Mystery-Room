@@ -4,7 +4,15 @@ import axios from 'axios';
 import { ArrowLeft, ArrowRight, Check, ClipboardList, FileText, Fingerprint, Image, MessageSquare, Search, ShieldCheck, Siren, Video, X } from 'lucide-react';
 import { evidenceCategories } from './data/evidenceCategories.js';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api/v1' : '/api/v1'), timeout: 12000, withCredentials: true });
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || (
+    import.meta.env.DEV
+      ? 'http://localhost:5000/api/v1'
+      : 'https://ai-mystery-room-api-4xkt.onrender.com/api/v1'
+  ),
+  timeout: 12000,
+  withCredentials: true
+});
 const CaseContext = createContext(null);
 const useCase = () => useContext(CaseContext);
 const errorMessage = (error) => error.response?.data?.message || 'The request could not be completed. Check the API connection and try again.';
