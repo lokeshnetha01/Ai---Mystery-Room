@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ai-mystery-room-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_TEXT_MODEL
+        value: gemini-3.8-flash
+      - key: IMAGE_PROVIDER
+        value: disabled
+      - key: VIDEO_PROVIDER
+        value: disabled
+      - key: MEDIA_STORAGE_PROVIDER
+        value: disabled
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLIENT_URL
+        sync: false
