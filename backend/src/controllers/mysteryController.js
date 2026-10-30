@@ -163,7 +163,7 @@ export async function getGenerationStatus(req, res, next) {
       status: status.status,
       stage: status.stage,
       updatedAt: status.updatedAt,
-      ...(status.status === 'failed' ? { errorCode: 'GENERATION_FAILED' } : {})
+      ...(status.status === 'failed'  ? { errorCode: status.errorCode || 'GENERATION_FAILED' }{})
     }));
   } catch (error) {
     next(error);
