@@ -16,11 +16,11 @@ services:
       - key: IMAGE_PROVIDER
         value: google-gemini
       - key: IMAGE_MODEL
-        value: gemini-nano-banana-2.1
+        value: gemini-3.1-flash-image
       - key: VIDEO_PROVIDER
         value: google-gemini
       - key: VIDEO_MODEL
-        value: gemini-omni-1.1-flash
+        value: gemini-omni-flash-preview
       - key: MEDIA_STORAGE_PROVIDER
         value: cloudinary
       - key: SESSION_SECRET
