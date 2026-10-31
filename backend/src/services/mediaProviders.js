@@ -46,14 +46,23 @@ async function uploadToCloudinary(bytes, { mimeType, resourceType, mysteryId, ev
 async function googleImage(prompt, apiKey) {
   const { GoogleGenAI } = await import('@google/genai');
   const client = new GoogleGenAI({ apiKey });
-  const interaction = await client.interactions.create({
+  const response = await client.models.generateContent({
     model: env.IMAGE_MODEL,
-    input: `Create a clearly fictional investigation evidence image. Do not include text labels, real people, or graphic content. ${prompt}`,
-    response_format: { type: 'image', mime_type: 'image/jpeg', aspect_ratio: '4:3', image_size: '1K' },
-    store: false
-  }, { timeout_ms: 120000, retries: 0 });
-  if (!interaction.output_image?.data) throw new Error('Image provider returned no image bytes');
-  return Buffer.from(interaction.output_image.data, 'base64');
+    contents: prompt,
+    config: {
+      responseModalities: ['IMAGE'],
+      responseFormat: {
+        image: { aspectRatio: '4:3', imageSize: '1K' }
+      }
+    }
+  });
+  const parts = response.candidates?.[0]?.content?.parts || [];
+  const imagePart = parts.find((part) => part.inlineData?.data);
+  if (!imagePart) {
+    const reason = response.promptFeedback?.blockReason || 'No image data returned';
+    throw new Error(`Image provider returned no image bytes: ${reason}`);
+  }
+  return Buffer.from(imagePart.inlineData.data, 'base64');
 }
 
 async function googleVideo(prompt, apiKey) {
