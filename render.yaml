@@ -14,16 +14,30 @@ services:
       - key: GEMINI_TEXT_MODEL
         value: gemini-3.8-flash
       - key: IMAGE_PROVIDER
-        value: disabled
+        value: google-gemini
+      - key: IMAGE_MODEL
+        value: gemini-nano-banana-2.1
       - key: VIDEO_PROVIDER
-        value: disabled
+        value: google-gemini
+      - key: VIDEO_MODEL
+        value: gemini-omni-1.1-flash
       - key: MEDIA_STORAGE_PROVIDER
-        value: disabled
+        value: cloudinary
       - key: SESSION_SECRET
         generateValue: true
       - key: MONGODB_URI
         sync: false
       - key: GEMINI_API_KEY
+        sync: false
+      - key: IMAGE_API_KEY
+        sync: false
+      - key: VIDEO_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
         sync: false
       - key: CLIENT_URL
         sync: false
