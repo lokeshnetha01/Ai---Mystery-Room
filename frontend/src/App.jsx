@@ -77,7 +77,26 @@ function CaseLoading({ status, message }) { return <PageFrame status={status} cl
 function InvestigationPage({ status }) {
   const { id } = useParams(); const { notes, setNotes } = useCase();
   const [record, setRecord] = useState(null); const [loadError, setLoadError] = useState(''); const [activeTab, setActiveTab] = useState('all'); const [selected, setSelected] = useState(''); const [noteText, setNoteText] = useState(''); const [editing, setEditing] = useState(''); const [showComparison, setShowComparison] = useState(false);
-  useEffect(() => { let active = true; api.get(`/mysteries/${id}`).then(({ data }) => { if (!active) return; setRecord(data.data); setSelected(data.data.evidence[0]?.id || ''); }).catch((error) => active && setLoadError(errorMessage(error))); return () => { active = false; }; }, [id]);
+  useEffect(() => {
+    let active = true;
+    let timer;
+    const refresh = async (initial = false) => {
+      try {
+        const { data } = await api.get(`/mysteries/${id}`);
+        if (!active) return;
+        setRecord(data.data);
+        if (initial) setSelected(data.data.evidence[0]?.id || '');
+        const mediaPending = data.data.evidence.some((item) => ['pending', 'processing'].includes(item.media?.status))
+          || data.data.suspects.some((person) => ['pending', 'processing'].includes(person.profileImage?.status));
+        if (mediaPending) timer = setTimeout(() => void refresh(), 4000);
+      } catch (error) {
+        if (active && initial) setLoadError(errorMessage(error));
+        else if (active) timer = setTimeout(() => void refresh(), 8000);
+      }
+    };
+    void refresh(true);
+    return () => { active = false; clearTimeout(timer); };
+  }, [id]);
   const [noteError, setNoteError] = useState(''); const [savingNote, setSavingNote] = useState(false);
   useEffect(() => { let active = true; api.get(`/mysteries/${id}/notes`).then(({ data }) => { if (active) setNotes((current) => [...current.filter((note) => note.caseId !== id), ...data.data.map((note) => ({ ...note, caseId: id }))]); }).catch((error) => active && setNoteError(errorMessage(error))); return () => { active = false; }; }, [id, setNotes]);
   const caseNotes = notes.filter((note) => note.caseId === id);

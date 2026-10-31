@@ -41,7 +41,7 @@ The frontend can run without MongoDB, but case, notes, and accusation APIs need 
 
 ## Optional media generation
 
-To generate and store image and video evidence, configure the relevant provider and Cloudinary values in `backend/.env`:
+To generate and store image and video evidence, configure the relevant provider and Cloudinary values in `backend/.env` (or the equivalent Render environment variables):
 
 ```dotenv
 IMAGE_PROVIDER=google-gemini
@@ -56,7 +56,7 @@ CLOUDINARY_API_KEY=your-cloudinary-key
 CLOUDINARY_API_SECRET=your-cloudinary-secret
 ```
 
-Without a configured provider and storage, image/video evidence is clearly marked unavailable. The API does not invent media URLs.
+Images and video need both a Google Gemini API key with media model access and a Cloudinary account. The app generates each asset in the backend, stores it in Cloudinary, and displays its status while generation is in progress. Without valid provider and storage credentials, media is marked unavailable. The API does not invent media URLs.
 
 ## Commands
 
@@ -74,12 +74,12 @@ Deployment configuration is included in [`vercel.json`](./vercel.json) and [`ren
 Setup order:
 
 1. Push the repository to a Git provider and create the Vercel project with the repository root (`.`) as its project root. Keep the build command and output directory from `vercel.json`. Note the production Vercel URL.
-2. Create the Render service from the repository's Blueprint (`render.yaml`). Set `CLIENT_URL` to the exact Vercel production origin (for example, `https://your-project.vercel.app`). Enter `MONGODB_URI` and `GEMINI_API_KEY` in Render's environment setup. Render generates `SESSION_SECRET`.
+2. Create the Render service from the repository's Blueprint (`render.yaml`). Set `CLIENT_URL` to the exact Vercel production origin (for example, `https://your-project.vercel.app`). Enter `MONGODB_URI`, `GEMINI_API_KEY`, and the Cloudinary cloud name, API key, and API secret in Render's environment setup. The separate `IMAGE_API_KEY` and `VIDEO_API_KEY` are optional; when blank, the app uses `GEMINI_API_KEY`. Render generates `SESSION_SECRET`.
 3. In MongoDB Atlas, allow the Render service's outbound IP range and ensure the database user has only the permissions needed by this app. Keep database and Gemini credentials in Render's secret environment variables; never commit them.
 4. Confirm Render is healthy at `https://ai-mystery-room-api.onrender.com/api/v1/health`. If its hostname differs, update the Vercel rewrite destination in `vercel.json`, commit, and redeploy.
 5. Redeploy Vercel, then test the deployed landing page, case generation, investigation session persistence, accusation, and gated result reveal. Check Render logs and Vercel deployment logs if any step fails.
 
-The Render Blueprint disables image/video generation and media storage. Those evidence types remain unavailable until configured in a later version. The `free` Render plan may sleep when idle and can have a cold start; choose a paid plan if that is unsuitable. Deployment is not complete until both providers have deployed the app and the live workflow has passed.
+The Render Blueprint enables image/video generation and Cloudinary storage, but these features stay unavailable until valid media and Cloudinary credentials are entered in Render. Google model access and quota can vary by account. The `free` Render plan may sleep when idle and can have a cold start; choose a paid plan if that is unsuitable. Deployment is not complete until both providers have deployed the app and the live workflow has passed.
 
 ## Progress
 
