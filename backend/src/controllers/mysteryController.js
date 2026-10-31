@@ -169,7 +169,7 @@ export async function getGenerationStatus(req, res, next) {
       status: status.status,
       stage: status.stage,
       updatedAt: status.updatedAt,
-      ...(status.status === 'failed'  ? { errorCode: status.errorCode || 'GENERATION_FAILED' } : {})
+     ...(status.status === 'failed'? { errorCode: status.errorCode || 'GENERATION_FAILED' }: {})
     }));
   } catch (error) {
     next(error);
@@ -270,7 +270,7 @@ export async function findOwnedMystery(id, sessionId) {
   if (!mongoose.isValidObjectId(id)) return null;
 
   return Mystery.findOne({ _id: id, sessionId })
-    .select('+generationStatus.errorCode');
+  .select('+generationStatus.errorCode');
 }
 
 export function readOnlyObject(_req, res) {
