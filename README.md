@@ -46,10 +46,10 @@ To generate and store image and video evidence, configure the relevant provider 
 ```dotenv
 IMAGE_PROVIDER=google-gemini
 IMAGE_API_KEY=your-google-key
-IMAGE_MODEL=gemini-nano-banana-2.1
+IMAGE_MODEL=gemini-3.1-flash-image
 VIDEO_PROVIDER=google-gemini
 VIDEO_API_KEY=your-google-key
-VIDEO_MODEL=gemini-omni-1.1-flash
+VIDEO_MODEL=gemini-omni-flash-preview
 MEDIA_STORAGE_PROVIDER=cloudinary
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-cloudinary-key
