@@ -46,23 +46,26 @@ async function uploadToCloudinary(bytes, { mimeType, resourceType, mysteryId, ev
 async function googleImage(prompt, apiKey) {
   const { GoogleGenAI } = await import('@google/genai');
   const client = new GoogleGenAI({ apiKey });
-  const response = await client.models.generateContent({
+  const interaction = await client.interactions.create({
     model: env.IMAGE_MODEL,
-    contents: prompt,
-    config: {
-      responseModalities: ['IMAGE'],
-      responseFormat: {
-        image: { aspectRatio: '4:3', imageSize: '1K' }
-      }
-    }
+    input: prompt,
+    response_format: {
+      type: 'image',
+      mime_type: 'image/png',
+      aspect_ratio: '4:3',
+      image_size: '1K'
+    },
+    store: false
   });
-  const parts = response.candidates?.[0]?.content?.parts || [];
-  const imagePart = parts.find((part) => part.inlineData?.data);
-  if (!imagePart) {
-    const reason = response.promptFeedback?.blockReason || 'No image data returned';
-    throw new Error(`Image provider returned no image bytes: ${reason}`);
+
+  const imageData = interaction.output_image?.data
+    || interaction.steps?.flatMap((step) => step.content || []).find((part) => part.type === 'image' && part.data)?.data;
+
+  if (!imageData) {
+    const detail = interaction.status || 'No image data returned';
+    throw new Error(`Image provider returned no image bytes: ${detail}`);
   }
-  return Buffer.from(imagePart.inlineData.data, 'base64');
+  return Buffer.from(imageData, 'base64');
 }
 
 async function googleVideo(prompt, apiKey) {
