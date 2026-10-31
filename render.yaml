@@ -1,8 +1,10 @@
+
 services:
   - type: web
     name: ai-mystery-room-api
     runtime: node
     plan: free
+    rootDir: backend
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/v1/health
@@ -25,4 +27,3 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
-        rootDir: backend

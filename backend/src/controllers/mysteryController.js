@@ -104,7 +104,13 @@ async function processGeneration(mysteryId, input) {
     await setGenerationState(mysteryId, 'failed', 'failed', error.code || 'GENERATION_FAILED').catch(() => {});
     const upstreamText = String(error.cause?.message || '');
     const upstreamMessage = (process.env.GEMINI_API_KEY ? upstreamText.replaceAll(process.env.GEMINI_API_KEY, '[redacted]') : upstreamText).slice(0, 400);
-    console.error(`Mystery generation failed for ${mysteryId}`, JSON.stringify({ code: error.code || 'GENERATION_FAILED', upstreamStatus: error.cause?.status || undefined, upstreamError: error.cause?.name || undefined, upstreamMessage }));
+    console.error(`Mystery generation failed for ${mysteryId}`, JSON.stringify({
+  code: error.code || 'GENERATION_FAILED',
+  validationIssues: error.issues || undefined,
+  upstreamStatus: error.cause?.status || undefined,
+  upstreamError: error.cause?.name || undefined,
+  upstreamMessage
+}));
   }
 }
 
@@ -163,7 +169,7 @@ export async function getGenerationStatus(req, res, next) {
       status: status.status,
       stage: status.stage,
       updatedAt: status.updatedAt,
-      ...(status.status === 'failed'  ? { errorCode: status.errorCode || 'GENERATION_FAILED' }{})
+      ...(status.status === 'failed'  ? { errorCode: status.errorCode || 'GENERATION_FAILED' } : {})
     }));
   } catch (error) {
     next(error);
@@ -262,7 +268,9 @@ export async function getEvidenceItem(req, res, next) {
 
 export async function findOwnedMystery(id, sessionId) {
   if (!mongoose.isValidObjectId(id)) return null;
-  return Mystery.findOne({ _id: id, sessionId });
+
+  return Mystery.findOne({ _id: id, sessionId })
+    .select('+generationStatus.errorCode');
 }
 
 export function readOnlyObject(_req, res) {
